@@ -18,8 +18,18 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthSuccess }) => {
     }, 3500);
   };
 
+  const forceLogout = () => {
+    alert("SECURITY_PROTOCOL: Perjalanan hari ini telah tersimpan dalam keabadian digital. Menjaga integritas NFT TM...");
+    window.location.reload();
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6 py-12 bg-[#050505]">
+    <div className="flex flex-col items-center justify-center min-h-screen px-6 py-12 bg-[#050505] relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-yellow-500/20 rounded-full blur-[120px]"></div>
+      </div>
+
       {/* AI Initial Greeting - Top Floating Text */}
       <div className="absolute top-12 left-0 right-0 text-center animate-fadeInUp px-8">
         <p className="text-[10px] font-orbitron text-yellow-500 tracking-[0.5em] uppercase mb-2">NeuroSphere Initializing...</p>
@@ -28,7 +38,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthSuccess }) => {
         </h1>
       </div>
 
-      <div className="w-full max-w-md glass-obsidian p-10 rounded-[4rem] border-t-4 border-yellow-500/50 shadow-2xl relative overflow-hidden mt-12">
+      <div className="w-full max-w-md glass-obsidian p-10 rounded-[4rem] border-t-4 border-yellow-500/50 shadow-2xl relative overflow-hidden mt-12 z-10">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-30 animate-pulse"></div>
 
         {!isSynced ? (

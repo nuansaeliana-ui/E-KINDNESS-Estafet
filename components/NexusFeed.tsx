@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { KindPost, UserState, AlienAvatar, DebateMessage } from '../types';
-import { getGuardianFilter, generateCouncilDebate } from '../services/geminiService';
+import { KindPost, UserState, AlienAvatar } from '../types';
+import { getGuardianFilter } from '../services/geminiService';
 
 const COUNCIL: AlienAvatar[] = [
   { id: 'a1', name: 'LOGOS', discipline: 'Mathematics', avatarUrl: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=200', auraColor: '#00f2ff', frequency: '528Hz', intonation: 'Precise', breathRate: 3, description: 'Optimasi sumber daya.' },
@@ -11,6 +11,17 @@ const COUNCIL: AlienAvatar[] = [
 
 const NexusFeed: React.FC<{ user: UserState, setUser: React.Dispatch<React.SetStateAction<UserState>> }> = ({ user, setUser }) => {
   const [posts, setPosts] = useState<KindPost[]>([
+    {
+      id: 'zion_tech_001',
+      author: 'ZION',
+      authorId: 'a3',
+      isAlien: true,
+      type: 'Council Insight',
+      content: 'TEKNIS ALOKASI 1%: Melalui Smart Contract "ShardingRelay_v1", 1% dari total Pool (14,206 LUV) akan didistribusikan secara merata kepada 1 juta jiwa pertama. Mekanisme ini menggunakan Proof of Kindness (PoK) untuk memvalidasi setiap node manusia tanpa perantara pusat.',
+      lineage: ['CORE', 'ZION'],
+      likes: 2450,
+      impactGuidance: 'Alokasi ini bersifat atomik dan non-inflasi. Pantau VAULT untuk transparansi ledger.'
+    },
     {
       id: 'zion_001',
       author: 'ZION',
@@ -30,22 +41,27 @@ const NexusFeed: React.FC<{ user: UserState, setUser: React.Dispatch<React.SetSt
     setUser(prev => ({ 
       ...prev, 
       luvBalance: prev.luvBalance + 0.0142, 
-      isFirstSession: true,
+      isFirstSession: false,
       hasReceivedFirstLuv: true 
     }));
     setShowZionWelcome(false);
   };
 
   const handleAppreciate = (postId: string, amount: number) => {
-    if ((user.lastLuvContribution || 0) + amount > 10) {
-      alert("Council Rule: Batas harian adalah 10 koin untuk menjaga stabilitas Tokenomy.");
+    const dailyLimit = 10;
+    const currentContribution = user.lastLuvContribution || 0;
+    
+    if (currentContribution + amount > dailyLimit) {
+      alert(`Council Rule: Batas harian adalah ${dailyLimit} LUV. Anda telah berkontribusi ${currentContribution} LUV hari ini.`);
       return;
     }
+
     setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: p.likes + amount } : p));
     setUser(prev => ({ 
       ...prev, 
       luvBalance: prev.luvBalance - amount,
-      lastLuvContribution: (prev.lastLuvContribution || 0) + amount
+      lastLuvContribution: currentContribution + amount,
+      aura: Math.min(100, prev.aura + (amount * 0.5)) // Appreciation boosts Aura
     }));
   };
 
@@ -68,6 +84,7 @@ const NexusFeed: React.FC<{ user: UserState, setUser: React.Dispatch<React.SetSt
     setPosts(prev => [newPost, ...prev]);
     setNewPostText('');
     setIsPosting(false);
+    setUser(prev => ({ ...prev, aura: Math.min(100, prev.aura + 2) })); // Posting boosts Aura
   };
 
   return (
@@ -108,7 +125,7 @@ const NexusFeed: React.FC<{ user: UserState, setUser: React.Dispatch<React.SetSt
             <div className="max-w-xl mx-auto">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 rounded-2xl border border-white/10 overflow-hidden grayscale">
-                  <img src={post.isAlien ? COUNCIL[2].avatarUrl : `https://i.pravatar.cc/100?u=${post.authorId}`} className="w-full h-full object-cover" alt="pfp" />
+                  <img src={post.isAlien ? (COUNCIL.find(c => c.name === post.author)?.avatarUrl || COUNCIL[2].avatarUrl) : `https://i.pravatar.cc/100?u=${post.authorId}`} className="w-full h-full object-cover" alt="pfp" />
                 </div>
                 <div>
                   <h4 className="text-xs font-orbitron tracking-widest text-white uppercase">{post.author}</h4>
@@ -121,7 +138,7 @@ const NexusFeed: React.FC<{ user: UserState, setUser: React.Dispatch<React.SetSt
               </div>
 
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-mono text-cyan-500">{post.likes} LUV</span>
+                <span className="text-[10px] font-mono text-cyan-500">{post.likes.toLocaleString()} LUV</span>
                 <div className="flex gap-2">
                   {[1, 5, 10].map(val => (
                     <button 
@@ -134,6 +151,13 @@ const NexusFeed: React.FC<{ user: UserState, setUser: React.Dispatch<React.SetSt
                   ))}
                 </div>
               </div>
+
+              {post.impactGuidance && (
+                <div className="mt-6 p-4 bg-cyan-500/5 rounded-2xl border border-cyan-500/10 text-[8px] font-mono text-gray-500 uppercase flex items-center gap-3">
+                  <span className="text-cyan-500 font-bold">GUIDANCE:</span>
+                  {post.impactGuidance}
+                </div>
+              )}
             </div>
           </div>
         ))}
