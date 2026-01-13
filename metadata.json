@@ -1,0 +1,8 @@
+{
+  "name": "E-KINDNESS Estafet Media",
+  "description": "A luxury cyberpunk platform for global kindness relay, featuring AI-driven filtering, NFT synchronization, and real-time kindness heatmaps.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
